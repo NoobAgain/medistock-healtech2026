@@ -1,0 +1,52 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        // Schema::create('unit', function (Blueprint $table) {
+        //     $table->id();
+
+        //     // Identitas Unit
+        //     $table->string('kode_unit')->unique()->index();
+
+        //     // Relasi organisasi
+        //     $table->foreignId('kodam_id')
+        //         ->nullable()
+        //         ->constrained('kodam')
+        //         ->nullOnDelete();
+
+        //     $table->foreignId('satuan_id')
+        //         ->nullable()
+        //         ->constrained('satuan')
+        //         ->nullOnDelete();
+
+        //     // Informasi Alamat
+        //     $table->string('alamat')->nullable();
+        //     $table->string('kelurahan')->nullable();
+        //     $table->string('kecamatan')->nullable();
+        //     $table->string('kabupaten')->nullable()->index();
+        //     $table->string('provinsi')->nullable()->index();
+        //     $table->string('kode_pos', 10)->nullable();
+
+        //     // Koordinat
+        //     $table->decimal('latitude', 10, 7)->nullable();
+        //     $table->decimal('longitude', 10, 7)->nullable();
+        //     $table->timestamps();
+        // });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('unit');
+    }
+};
+
+
+
+// php artisan migrate:rollback --path=database/migrations/2026_02_21_000000_create_units_table.php
+// php artisan migrate --path=database/migrations/2026_02_21_000000_create_units_table.php

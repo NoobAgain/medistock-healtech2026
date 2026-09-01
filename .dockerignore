@@ -1,0 +1,52 @@
+# Git
+.git
+.gitignore
+.github
+.opencode
+AGENTS.md
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+pnpm-lock.yaml
+
+# Composer
+vendor
+
+# Laravel Runtime
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+storage/framework/testing
+
+bootstrap/cache/*.php
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Docker (prevent recursion)
+docker-compose.yml
+docker-compose.yaml
+docker-compose.override.yml
+
+# Dot-prefixed folders
+.*/
+**/.*/
+
+# Database Dumps
+*.sql
+*.dump
+
+# IDE / OS
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Tests (optional untuk production image)
+tests
+phpunit.xml

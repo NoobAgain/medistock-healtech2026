@@ -1,0 +1,143 @@
+name: medistock-prod
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: docker/app/Dockerfile.prod
+            args:
+                VITE_AGGRID_LICENSIE: ${VITE_AGGRID_LICENSIE}
+                VITE_AGGRID_LICENSE: ${VITE_AGGRID_LICENSE}
+        image: medistock-app:prod
+        container_name: medistock_app_prod
+        restart: unless-stopped
+        working_dir: /var/www/html
+        env_file:
+            - .env
+        environment:
+            APP_ENV: production
+            APP_DEBUG: false
+            DB_HOST: pgsql
+            DB_PORT: 5432
+            REDIS_HOST: redis
+            REDIS_PORT: 6379
+        depends_on:
+            pgsql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        networks:
+            - laravel
+
+    nginx:
+        build:
+            context: .
+            dockerfile: docker/nginx/Dockerfile.prod
+        container_name: medistock_nginx_prod
+        restart: unless-stopped
+        depends_on:
+            app:
+                condition: service_started
+        expose:
+            - '80'
+        networks:
+            - laravel
+
+    crs:
+        image: owasp/modsecurity-crs:4.24.1-nginx-alpine-202603150103
+        container_name: medistock_owasp
+        restart: unless-stopped
+        depends_on:
+            - nginx
+        ports:
+            - "80:8080"
+            - "443:8443"
+        environment:
+            BACKEND: "http://nginx:80"
+            PORT: "8080"
+            SSL_PORT: "8443"
+            DNS_SERVER: "8.8.8.8"
+            NGINX_ALWAYS_TLS_REDIRECT: "on"
+            ERRORLOG: "/var/log/nginx/error.log"
+            ACCESSLOG: "/var/log/nginx/access.log"
+            BLOCKING_PARANOIA: 2
+            MODSEC_RULE_ENGINE: "DetectionOnly"
+            ANOMALY_INBOUND: 10
+            ANOMALY_OUTBOUND: 5
+            MODSEC_AUDIT_ENGINE: "RelevantOnly"
+            MODSEC_AUDIT_LOG_FORMAT: JSON
+            MODSEC_AUDIT_LOG_TYPE: Serial
+            MODSEC_AUDIT_LOG: "/var/log/nginx/modsec_audit.log"
+            MODSEC_RESP_BODY_ACCESS: "On"
+            MODSEC_RESP_BODY_MIMETYPE: "text/plain text/html text/xml application/json application/x-www-form-urlencoded multipart/form-data"
+            MODSEC_REQ_BODY_LIMIT: 67108864
+            MODSEC_REQ_BODY_NOFILES_LIMIT: 67108864
+            CRS_ENABLE_TEST_MARKER: 1
+            VALIDATE_UTF8_ENCODING: 1
+            RESTRICTED_EXTENSIONS: ".asa/ .asax/ .ascx/ .axd/ .backup/ .bak/ .bat/ .cdx/ .cer/ .cfg/ .cmd/ .com/ .config/ .conf/ .cs/ .csproj/ .csr/ .dat/ .db/ .dbf/ .dll/ .dos/ .htr/ .htw/ .ida/ .idc/ .idq/ .inc/ .ini/ .key/ .licx/ .lnk/ .log/ .mdb/ .old/ .pass/ .pdb/ .pol/ .printer/ .pwd/ .resources/ .resx/ .sql/ .sys/ .vb/ .vbs/ .vbproj/ .vsdisco/ .webinfo/ .xsd/ .xsx/"
+            ALLOWED_HTTP_VERSIONS: "HTTP/1.0 HTTP/1.1 HTTP/2 HTTP/2.0 HTTP/3 HTTP/3.0"
+            ALLOWED_METHODS: "GET POST"
+            WORKER_CONNECTIONS: 19000
+        volumes:
+            - ./docker/crs/includes/proxy_backend.conf.template:/etc/nginx/templates/includes/proxy_backend.conf.template:ro
+        networks:
+          laravel:
+
+    pgsql:
+        image: postgres:16-alpine
+        container_name: medistock_postgres_prod
+        restart: unless-stopped
+        environment:
+            POSTGRES_DB: ${DB_DATABASE:-medistock}
+            POSTGRES_USER: ${DB_USERNAME:-medistock}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        ports:
+            - "${FORWARD_DB_PORT:-5432}:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+            # Restore DB dari dump terbaru (folder induk "8. Server Lokal").
+            # Catatan: file dump diproses via script .sh agar kompatibel dengan hak akses user non-superuser.
+            - ../dump_terakhir.sql:/tmp/dump_terakhir.sql:ro
+            - ./docker/postgressDB/10_restore_dump.sh:/docker-entrypoint-initdb.d/10_restore_dump.sh:ro
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
+        networks:
+            - laravel
+
+    redis:
+        image: redis:7-alpine
+        container_name: medistock_redis_prod
+        restart: unless-stopped
+        command:
+            - redis-server
+            - --appendonly
+            - "yes"
+            - --requirepass
+            - ${REDIS_PASSWORD}
+        ports:
+            - "${FORWARD_REDIS_PORT:-6379}:6379"
+        volumes:
+            - redis_data:/data
+        healthcheck:
+            test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" ping"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 5s
+        environment:
+            REDIS_PASSWORD: ${REDIS_PASSWORD}
+        networks:
+            - laravel
+
+networks:
+    laravel:
+      driver: bridge
+
+volumes:
+    postgres_data:
+    redis_data:
+    pgadmin_data:

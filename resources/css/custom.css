@@ -1,0 +1,81 @@
+@layer components {
+    .input-login {
+        @apply h-11 w-full rounded-md border border-gray-300 bg-white pr-10 pl-10 text-sm text-gray-700 transition focus:border-verdigris focus:outline-none;
+    }
+}
+
+.bg-hero-logo {
+    position: relative;
+    overflow: hidden;
+}
+
+.bg-hero-logo::before {
+    content: '';
+    position: absolute;
+    top: -14%;
+    left: -11%;
+    width: 500px;
+    height: 500px;
+    background-image: url('@images/LogoOnly.svg');
+    background-repeat: no-repeat;
+    background-size: 500px auto;
+    transform: rotate(75deg);
+    pointer-events: none;
+    opacity: 0.6;
+    z-index: 0;
+    filter: blur(1px);
+}
+
+.bg-hero-logo::after {
+    content: '';
+    position: absolute;
+    right: -9%;
+    bottom: -7%;
+    width: 500px;
+    height: 500px;
+    background-image: url('@images/LogoOnly.svg');
+    background-repeat: no-repeat;
+    background-size: 500px auto;
+    transform: rotate(-15deg);
+    transform-origin: center center;
+    pointer-events: none;
+    opacity: 0.6;
+    z-index: 0;
+    filter: blur(1px);
+}
+
+/* ----------------------------------------------------------------
+	Transision
+-----------------------------------------------------------------*/
+.page-transition {
+    animation: 0.3s ease-out simpleFadeIn;
+}
+
+@keyframes simpleFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-down-enter-active,
+.slide-down-leave-active {
+    transition: all 0.3s ease;
+}
+
+.slide-down-enter-from,
+.slide-down-leave-to {
+    opacity: 0;
+    transform: translateY(-15px);
+}
+
+.slide-down-enter-to,
+.slide-down-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+}

@@ -1,0 +1,13 @@
+# Copy pre-built assets from the app image (built in Dockerfile.prod)
+# This ensures nginx serves the exact same hashed files that manifest.json references
+FROM traceguard-app:prod AS app_artifacts
+
+FROM nginx:1.27-alpine
+
+WORKDIR /var/www/html
+
+COPY docker/nginx/prod.conf /etc/nginx/conf.d/default.conf
+COPY . /var/www/html
+COPY --from=app_artifacts /var/www/html/public/build ./public/build
+
+EXPOSE 80

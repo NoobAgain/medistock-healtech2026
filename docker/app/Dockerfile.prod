@@ -1,0 +1,93 @@
+FROM composer:2 AS composer_deps
+
+WORKDIR /app
+
+COPY composer.json composer.lock ./
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --prefer-dist \
+    --optimize-autoloader \
+    --no-scripts
+
+
+FROM php:8.4-fpm-alpine AS base
+
+#
+# Catatan: pada beberapa jaringan, mirror default `dl-cdn.alpinelinux.org` bisa bermasalah (timeout/TLS) saat build.
+# Untuk membuat build lebih deterministik, kita pin ke mirror `dl-4.alpinelinux.org` (HTTPS).
+#
+RUN printf '%s\n' \
+        'https://dl-4.alpinelinux.org/alpine/v3.23/main' \
+        'https://dl-4.alpinelinux.org/alpine/v3.23/community' \
+    > /etc/apk/repositories
+
+RUN apk add --no-cache \
+        curl \
+        unzip \
+        nodejs \
+        npm \
+        postgresql-dev \
+        icu-dev \
+        libzip-dev \
+        libxml2-dev \
+        openssl-dev \
+        curl-dev \
+        oniguruma-dev \
+        $PHPIZE_DEPS \
+    && docker-php-ext-install -j$(nproc) \
+        pdo_mysql \
+        pdo_pgsql \
+        pgsql \
+        intl \
+        zip \
+        bcmath \
+        soap \
+        opcache \
+        pcntl \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apk del $PHPIZE_DEPS \
+    && rm -rf /tmp/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+ARG VITE_AGGRID_LICENSIE
+ARG VITE_AGGRID_LICENSE
+
+COPY . .
+COPY --from=composer_deps /app/vendor ./vendor
+
+#
+# Build asset frontend (Vite):
+# - Untuk paket "Server Lokal", folder `public/build/` sudah tersedia (hasil build).
+# - Jika `public/build/manifest.json` ada, kita SKIP `npm ci` + `npm run build`
+#   agar image bisa dibangun tanpa dependensi network ke registry npm.
+# - Jika file itu tidak ada (mis. source-only), barulah lakukan build Vite.
+#
+RUN if [ -f public/build/manifest.json ]; then \
+        echo "Frontend asset sudah ada (public/build), skip npm build"; \
+    else \
+        npm ci && npm run build && rm -rf node_modules; \
+    fi
+
+COPY docker/php/php-prod.ini /usr/local/etc/php/conf.d/php-prod.ini
+
+COPY docker/app/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+RUN mkdir -p \
+        /var/www/html/storage/framework/views \
+        /var/www/html/storage/framework/cache/data \
+        /var/www/html/storage/framework/sessions \
+        /var/www/html/storage/framework/testing \
+        /var/www/html/storage/logs \
+        /var/www/html/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 755 /var/www/html/storage /var/www/html/bootstrap/cache
+
+EXPOSE 9000
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["php-fpm"]

@@ -1,0 +1,11 @@
+/vendor
+/node_modules
+/storage/logs
+/.git
+/.env
+/.env.backup
+/.env.production
+/public/build
+/android
+Manual Book.pdf
+TraceguardAndroid.apk

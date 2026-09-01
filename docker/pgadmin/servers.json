@@ -1,0 +1,14 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "Laravel Postgres (Prod)",
+            "Group": "Servers",
+            "Host": "postgres",
+            "Port": 5432,
+            "MaintenanceDB": "medistock",
+            "Username": "medistock",
+            "SSLMode": "prefer",
+            "PassFile": "/pgpass"
+        }
+    }
+}
