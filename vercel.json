@@ -53,7 +53,7 @@
     "env": {
         "APP_NAME": "MediStock",
         "APP_ENV": "production",
-        "APP_DEBUG": "true",
+        "APP_DEBUG": "false",
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
         "APP_PACKAGES_CACHE": "/tmp/packages.php",
@@ -74,7 +74,7 @@
         "env": {
             "APP_NAME": "MediStock",
             "APP_ENV": "production",
-            "APP_DEBUG": "true",
+            "APP_DEBUG": "false",
             "CACHE_STORE": "array",
             "SESSION_DRIVER": "database",
             "SESSION_CONNECTION": "pgsql",
