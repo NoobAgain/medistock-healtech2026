@@ -15,6 +15,11 @@ $_ENV['LOG_CHANNEL'] = 'stderr';
 $_SERVER['LOG_CHANNEL'] = 'stderr';
 putenv('LOG_CHANNEL=stderr');
 
+// Paksa maintenance driver — fix ArgumentCountError dari config/app.php
+$_ENV['APP_MAINTENANCE_DRIVER'] = 'file';
+$_SERVER['APP_MAINTENANCE_DRIVER'] = 'file';
+putenv('APP_MAINTENANCE_DRIVER=file');
+
 $app = require __DIR__ . '/../bootstrap/app.php';
 
 $app->useStoragePath($tmpStorage);
