@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';   // <-- WAJIB paling atas, sebelum baris lain apapun
+require __DIR__ . '/../vendor/autoload.php';
 
 // Paksa semua storage path ke /tmp — read-only fix
 $tmpStorage = '/tmp/storage';
@@ -19,4 +19,12 @@ $app = require __DIR__ . '/../bootstrap/app.php';
 
 $app->useStoragePath($tmpStorage);
 
-// ... sisanya (kernel handle request, dst) tetap seperti semula
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+
+$request = Illuminate\Http\Request::capture();
+
+$response = $kernel->handle($request);
+
+$response->send();
+
+$kernel->terminate($request, $response);
