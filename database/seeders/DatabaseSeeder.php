@@ -18,9 +18,10 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
         $this->call([
+            // Buat user admin terlebih dahulu agar role dapat di-assign
+            default_uac::class,
             RolePermissionSeeder::class,
             // FaskesSeeder::class,
-            // default_uac::class,
         ]);
     }
 }
