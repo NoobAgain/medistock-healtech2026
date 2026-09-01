@@ -42,6 +42,7 @@ class RolePermissionSeeder extends Seeder
             'menu.alokasi.edit',
             'menu.alokasi.accrencana',
             'menu.alokasi.accrencanapusat',
+            'menu.alokasi.addeditperiode',
 
             // TenagaMedis
             'menu.tenaga_medis',
@@ -69,6 +70,9 @@ class RolePermissionSeeder extends Seeder
             'menu.inventory.hapus',
             'menu.inventory.edit',
 
+            // Pencarian / Pelacakan
+            'menu.pencarian',
+
             // Pengiriman
             'menu.pengiriman',
             'menu.pengiriman.baru',
@@ -91,6 +95,9 @@ class RolePermissionSeeder extends Seeder
             // System
             'system.manage_roles',
             'system.view_logs',
+
+            // Test Reader
+            'menu.reader',
         ];
 
         foreach ($permissions as $permission) {

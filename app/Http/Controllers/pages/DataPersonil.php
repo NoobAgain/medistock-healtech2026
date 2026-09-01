@@ -24,7 +24,7 @@ class DataPersonil extends Controller
     {
         Gate::authorize('viewAny', TenagaMedis::class);
         AuditService::logMenuAccess('Data TenagaMedis');
-        return Inertia::render('DataTenagaMedis');
+        return Inertia::render('DataPersonil');
     }
 
     public function listDataPersonil(Request $request)
@@ -200,7 +200,7 @@ class DataPersonil extends Controller
             }
         }
 
-        return Inertia::render('DataTenagaMedisBaru', $props);
+        return Inertia::render('DataPersonilBaru', $props);
     }
 
     public function dataPersonilBaru(StoreTenagaMedisRequest $request)
@@ -428,7 +428,7 @@ class DataPersonil extends Controller
             $dataFaskes = Faskes::get();
             $dataUnitRawat = UnitRawat::all();
 
-            return Inertia::render('DataTenagaMedisUpload', [
+            return Inertia::render('DataPersonilUpload', [
                 'faskes' => $dataFaskes->map(fn($k) => ['id' => $k->id, 'nama' => $k->nama]),
                 'unit_rawat' => $dataUnitRawat->map(fn($s) => ['id' => $s->id, 'nama' => $s->nama]),
             ]);
