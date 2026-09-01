@@ -215,7 +215,7 @@ Route::middleware(['auth'])->group(function () {
 Route::prefix('guardrail')->middleware('throttle:5,1')->group(function () {
     Route::get('/pubkey', function () {
         return response()->json([
-            'key' => file_get_contents(storage_path('crypto/public.pem')),
+            'key' => file_get_contents(base_path('storage/crypto/public.pem')),
         ]);
     })->name('guardrail.pubkey');
 });

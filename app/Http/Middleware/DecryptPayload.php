@@ -16,7 +16,7 @@ class DecryptPayload
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->header('x-enc-key') && $request->header('x-enc-iv')) {
-            $privateKeyPath = storage_path('crypto/private.pem');
+            $privateKeyPath = base_path('storage/crypto/private.pem');
 
             if (! file_exists($privateKeyPath)) {
                 return response()->json([
