@@ -19,8 +19,9 @@
         { "src": "/(.*)", "dest": "/api/index.php" }
     ],
     "env": {
+        "APP_NAME": "MediStock",
         "APP_ENV": "production",
-        "APP_DEBUG": "true",
+        "APP_DEBUG": "false",
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
         "APP_PACKAGES_CACHE": "/tmp/packages.php",
@@ -30,6 +31,8 @@
         "CACHE_STORE": "array",
         "SESSION_DRIVER": "database",
         "SESSION_CONNECTION": "pgsql",
+        "SESSION_LIFETIME": "120",
+        "SESSION_COOKIE": "medistock_session",
         "QUEUE_CONNECTION": "sync",
         "LOG_CHANNEL": "stderr",
         "DB_CONNECTION": "pgsql",
@@ -37,11 +40,13 @@
     },
     "build": {
         "env": {
+            "APP_NAME": "MediStock",
             "APP_ENV": "production",
-            "APP_DEBUG": "true",
+            "APP_DEBUG": "false",
             "CACHE_STORE": "array",
             "SESSION_DRIVER": "database",
             "SESSION_CONNECTION": "pgsql",
+            "SESSION_LIFETIME": "120",
             "QUEUE_CONNECTION": "sync",
             "LOG_CHANNEL": "stderr",
             "DB_CONNECTION": "pgsql",
